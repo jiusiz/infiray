@@ -1,0 +1,74 @@
+plugins {
+    id 'com.android.library'
+    id 'org.jetbrains.kotlin.android'
+}
+
+android {
+    namespace 'com.jiusiz.uvc'
+    compileSdk 32
+
+    defaultConfig {
+        minSdk 21
+        targetSdk 32
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles "consumer-rules.pro"
+        externalNativeBuild {
+            cmake {
+                cppFlags ""
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    externalNativeBuild {
+        cmake {
+            path "src/main/cpp/CMakeLists.txt"
+            version "3.18.1"
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    packagingOptions {
+        pickFirst 'libs/arm64-v8a/libjpeg-turbo1500.so'
+        pickFirst 'libs/arm64-v8a/libsimplePictureProcessing.so'
+        pickFirst 'libs/arm64-v8a/libthermometry.so'
+        pickFirst 'libs/arm64-v8a/libusb100.so'
+        pickFirst 'libs/arm64-v8a/libUVCCamera.so'
+        // 去除重复的so
+        pickFirst 'lib/arm64-v8a/libuvc.so'
+        pickFirst 'lib/armeabi/libuvc.so'
+        pickFirst 'lib/armeabi-v7a/libuvc.so'
+        pickFirst 'lib/mips/libuvc.so'
+        pickFirst 'lib/x86/libuvc.so'
+        pickFirst 'lib/x86_64/libuvc.so'
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['libs']
+            jni.srcDirs = [] //disable automatic ndk-build call
+        }
+    }
+}
+
+dependencies {
+    api fileTree(include: ['*.jar'], dir: 'libs')
+//    api files('src/main/libs/classes.jar')
+//    api fileTree(dir: new File(buildDir, 'libs'), include: '*.jar')
+    implementation 'androidx.core:core-ktx:1.7.0'
+    implementation 'androidx.appcompat:appcompat:1.5.1'
+    implementation 'com.google.android.material:material:1.7.0'
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.4'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.0'
+}

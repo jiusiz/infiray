@@ -1,18 +1,87 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    android:layout_height="match_parent">
 
-    <TextView
+    <ScrollView
+        android:id="@+id/toLeft"
+        android:layout_width="100dp"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <!--<Button
+                android:id="@+id/preview_button"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:keepScreenOn="true"
+                android:scaleType="centerCrop"
+                android:text="预览" />-->
+
+            <Button
+                android:id="@+id/camera_button"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:keepScreenOn="true"
+                android:scaleType="centerCrop"
+                android:text="测温" />
+
+            <Button
+                android:id="@+id/getcapture_button"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:keepScreenOn="true"
+                android:scaleType="centerCrop"
+                android:text="拍照" />
+
+            <Button
+                android:id="@+id/shut_button"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:keepScreenOn="true"
+                android:scaleType="centerCrop"
+                android:text="快门" />
+
+            <Button
+                android:id="@+id/color_button"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:keepScreenOn="true"
+                android:scaleType="centerCrop"
+                android:text="色板" />
+            <Button
+                android:id="@+id/range_button"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:keepScreenOn="true"
+                android:scaleType="centerCrop"
+                android:text="宽测温" />
+        </LinearLayout>
+    </ScrollView>
+
+    <RelativeLayout
+        android:id="@+id/showQY"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_height="match_parent"
+        android:layout_alignParentEnd="true"
+        android:layout_toEndOf="@+id/toLeft">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <com.jiusiz.infiray.SimpleUVCCameraTextureView
+            android:id="@+id/camera_view123"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent" />
+
+        <TextView
+            android:id="@+id/tv_temp"
+            android:layout_alignParentRight="true"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="10dp"
+            android:textColor="#000"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </RelativeLayout>
+
+</RelativeLayout>

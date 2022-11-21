@@ -1,3 +1,4 @@
+// 顶级构建文件，您可以在其中添加所有子项目模块通用的配置选项。
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 plugins {
     id 'com.android.application' version '7.3.1' apply false
