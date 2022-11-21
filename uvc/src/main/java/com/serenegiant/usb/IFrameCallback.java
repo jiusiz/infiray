@@ -18,5 +18,5 @@ public interface IFrameCallback {
 	 * instead of using IFrameCallback(this way is much efficient in most case than using IFrameCallback).
 	 * @param frame this is direct ByteBuffer from JNI layer and you should handle it's byte order and limitation.
 	 */
-	public void onFrame(ByteBuffer frame);
+	void onFrame(ByteBuffer frame);
 }

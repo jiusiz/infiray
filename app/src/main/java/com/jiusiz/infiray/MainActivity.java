@@ -120,9 +120,11 @@ public class MainActivity extends Activity {
                     break;
                 case R.id.getcapture_button:
                     Bitmap bitmap = mUVCCameraView.getBitmap();
-                    saveImage(bitmap);//拍照
+                    //拍照
+                    saveImage(bitmap);
                     break;
-                case R.id.range_button://切换宽测温
+                //切换宽测温
+                case R.id.range_button:
                     if (TemperatureRange == 120) {
                         TemperatureRange = 400;
                         mUVCCamera.setTempRange(TemperatureRange);
@@ -169,7 +171,6 @@ public class MainActivity extends Activity {
                             iColor = 0;
                             break;
                     }
-
                     break;
             }
         }
@@ -183,7 +184,8 @@ public class MainActivity extends Activity {
         timerEveryTime.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
-                mUVCCamera.setZoom(0x8000);//打快门
+                //打快门
+                mUVCCamera.setZoom(0x8000);
                 Log.e(TAG, "每隔3分钟执行一次操作");
             }
         }, 1000, 180000);
@@ -216,8 +218,7 @@ public class MainActivity extends Activity {
     }
 
     private void tempTureing() {
-        ITemperatureCallback mTempCb = ahITemperatureCallback;
-        mUVCCamera.setTemperatureCallback(mTempCb);
+        mUVCCamera.setTemperatureCallback(ahITemperatureCallback);
         mUVCCamera.startTemp();
         isTemp = true;
     }
@@ -274,7 +275,7 @@ public class MainActivity extends Activity {
 
         mUVCCamera = new UVCCamera(0);
         mUVCCamera.open(ctrlBlock);
-//        mUVCCamera = camera;
+        // mUVCCamera = camera;
 
         if (mUVCCamera != null) {
             String mSupportedSize = mUVCCamera.getSupportedSize();
@@ -311,13 +312,10 @@ public class MainActivity extends Activity {
         public void onAttach(final UsbDevice device) {
             if (device.getDeviceClass() == 239 && device.getDeviceSubclass() == 2) {
                 Handler handler = new Handler();
-                handler.postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        usbDevice = device;
-                        Log.e(TAG, "onAttach:" + usbDevice.getProductName());
-                        mUSBMonitor.requestPermission(device);
-                    }
+                handler.postDelayed(() -> {
+                    usbDevice = device;
+                    Log.e(TAG, "onAttach:" + usbDevice.getProductName());
+                    mUSBMonitor.requestPermission(device);
                 }, 100);
             }
         }
@@ -328,11 +326,9 @@ public class MainActivity extends Activity {
             handleOpen(ctrlBlock);
             startPreview();
             Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    UVCsetValue(UVCCamera.CTRL_ZOOM_ABS, 0x8004);//切换数据输出8004原始8005yuv,80ff保存
-                }
+            handler.postDelayed(() -> {
+                //切换数据输出8004原始8005yuv,80ff保存
+                UVCsetValue(UVCCamera.CTRL_ZOOM_ABS, 0x8004);
             }, 300);
 
 
@@ -412,7 +408,7 @@ public class MainActivity extends Activity {
      * 通过byte数组取到short
      */
     public static short getShort(byte[] b, int index) {
-        return (short) (((b[index + 1] << 8) | b[index + 0] & 0xff));
+        return (short) (((b[index + 1] << 8) | b[index] & 0xff));
     }
 
     /**
@@ -420,7 +416,7 @@ public class MainActivity extends Activity {
      */
     public static float getFloat(byte[] b, int index) {
         int l;
-        l = b[index + 0];
+        l = b[index];
         l &= 0xff;
         l |= ((long) b[index + 1] << 8);
         l &= 0xffff;
@@ -457,18 +453,18 @@ public class MainActivity extends Activity {
     }
 
     public interface CameraCallback {
-        public void onOpen();
+        void onOpen();
 
-        public void onClose();
+        void onClose();
 
-        public void onStartPreview();
+        void onStartPreview();
 
-        public void onStopPreview();
+        void onStopPreview();
 
-        public void onError(Exception e);
+        void onError(Exception e);
     }
 
-    private Set<CameraCallback> mCallbacks = new CopyOnWriteArraySet<CameraCallback>();
+    private Set<CameraCallback> mCallbacks = new CopyOnWriteArraySet<>();
 
     private void callOnError(Exception e) {
         for (CameraCallback callback : mCallbacks) {
@@ -482,7 +478,7 @@ public class MainActivity extends Activity {
     }
 
     /**
-     * for accessing UVC camera
+     * 用于访问 UVCCamera
      */
     private UVCCamera mUVCCamera;
 
@@ -517,7 +513,7 @@ public class MainActivity extends Activity {
         mUVCCamera.startPreview();
         /*===========================================================================
          * if need rgba callback
-         *set this setFrameCallback(...) function
+         * set this setFrameCallback(...) function
          *==========================================================================*/
         mUVCCamera.setFrameCallback(mIFrameCallback, UVCCamera.PIXEL_FORMAT_RGBX);
         mUVCCamera.startCapture();
@@ -562,7 +558,7 @@ public class MainActivity extends Activity {
         return 100;
     }
 
-    //测温数据返回
+    // 测温数据返回
     private float[] temperature1 = new float[640 * 512 + 10];
     public final ITemperatureCallback ahITemperatureCallback = new ITemperatureCallback() {
         @Override
@@ -576,59 +572,57 @@ public class MainActivity extends Activity {
             //temperature1[5] //MIXY1，最低温点Y坐标
             //temperature1[6]最低温，
             //7，8和9为备用参数
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    tTemp.setText("中心温度：" + String.valueOf(temperature1[0]).substring(0, 5));
-                }
+            runOnUiThread(() -> {
+                String text = "中心温度：" + String.valueOf(temperature1[0]).substring(0, 5);
+                tTemp.setText(text);
             });
             System.arraycopy(temperature, 0, temperature1, 0, (mHeight - 4) * mWidth + 10);
         }
     };
 
 
-    private ByteUtil mByteUtil = new ByteUtil();
+    //private ByteUtil mByteUtil = new ByteUtil();
     private sendCommand mSendCommand = new sendCommand();
 
     //设置校正
     private void setCorrection(float fiputCo) {
         byte[] iputCo = new byte[4];
-        mByteUtil.putFloat(iputCo, fiputCo, 0);
+        ByteUtil.putFloat(iputCo, fiputCo, 0);
         mSendCommand.sendFloatCommand(0 * 4, iputCo[0], iputCo[1], iputCo[2], iputCo[3], 20, 40, 60, 80, 120, 140);
     }
 
     //设置反射温度
     private void setReflection(float fiputRe) {
         byte[] iputRe = new byte[4];
-        mByteUtil.putFloat(iputRe, fiputRe, 0);
+        ByteUtil.putFloat(iputRe, fiputRe, 0);
         mSendCommand.sendFloatCommand(1 * 4, iputRe[0], iputRe[1], iputRe[2], iputRe[3], 20, 40, 60, 80, 120, 140);
     }
 
     //设置环境温度
     private void setAmbtemp(float fiputAm) {
         byte[] iputAm = new byte[4];
-        mByteUtil.putFloat(iputAm, fiputAm, 0);
+        ByteUtil.putFloat(iputAm, fiputAm, 0);
         mSendCommand.sendFloatCommand(2 * 4, iputAm[0], iputAm[1], iputAm[2], iputAm[3], 20, 40, 60, 80, 120, 140);
     }
 
     //设置湿度
     private void setHumidity(float fiputHu) {
         byte[] iputHu = new byte[4];
-        mByteUtil.putFloat(iputHu, fiputHu, 0);
+        ByteUtil.putFloat(iputHu, fiputHu, 0);
         mSendCommand.sendFloatCommand(3 * 4, iputHu[0], iputHu[1], iputHu[2], iputHu[3], 20, 40, 60, 80, 120, 140);
     }
 
     //设置发射率
     private void setEmissivity(float fiputEm) {
         byte[] iputEm = new byte[4];
-        mByteUtil.putFloat(iputEm, fiputEm, 0);
+        ByteUtil.putFloat(iputEm, fiputEm, 0);
         mSendCommand.sendFloatCommand(4 * 4, iputEm[0], iputEm[1], iputEm[2], iputEm[3], 20, 40, 60, 80, 120, 140);
     }
 
     //设置距离参数
     private void setDistance(int distance) {
         byte[] bIputDi = new byte[4];
-        mByteUtil.putInt(bIputDi, distance, 0);
+        ByteUtil.putInt(bIputDi, distance, 0);
         mSendCommand.sendShortCommand(5 * 4, bIputDi[0], bIputDi[1], 20, 40, 60, 80);
     }
 
@@ -638,75 +632,25 @@ public class MainActivity extends Activity {
         public void sendFloatCommand(int position, byte value0, byte value1, byte value2, byte value3, int interval0, int interval1, int interval2, int interval3, int interval4, int interval5) {
             psitionAndValue0 = (position << 8) | (0x000000ff & value0);
             Handler handler0 = new Handler();
-            handler0.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    mUVCCamera.setZoom(psitionAndValue0);
-                }
-            }, interval0);
+            handler0.postDelayed(() -> mUVCCamera.setZoom(psitionAndValue0), interval0);
             psitionAndValue1 = ((position + 1) << 8) | (0x000000ff & value1);
-            handler0.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    mUVCCamera.setZoom(psitionAndValue1);
-                }
-            }, interval1);
+            handler0.postDelayed(() -> mUVCCamera.setZoom(psitionAndValue1), interval1);
             psitionAndValue2 = ((position + 2) << 8) | (0x000000ff & value2);
-            handler0.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    mUVCCamera.setZoom(psitionAndValue2);
-                }
-            }, interval2);
+            handler0.postDelayed(() -> mUVCCamera.setZoom(psitionAndValue2), interval2);
             psitionAndValue3 = ((position + 3) << 8) | (0x000000ff & value3);
-            handler0.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    mUVCCamera.setZoom(psitionAndValue3);
-                }
-            }, interval3);
-            handler0.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    mUVCCamera.whenShutRefresh();
-                }
-            }, interval4);
-            handler0.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    mUVCCamera.setZoom(0x80ff);
-                }
-            }, interval5);
+            handler0.postDelayed(() -> mUVCCamera.setZoom(psitionAndValue3), interval3);
+            handler0.postDelayed(() -> mUVCCamera.whenShutRefresh(), interval4);
+            handler0.postDelayed(() -> mUVCCamera.setZoom(0x80ff), interval5);
         }
 
         public void sendShortCommand(int position, byte value0, byte value1, int interval0, int interval1, int interval2, int interval3) {
             psitionAndValue0 = (position << 8) | (0x000000ff & value0);
             Handler handler0 = new Handler();
-            handler0.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    mUVCCamera.setZoom(psitionAndValue0);
-                }
-            }, interval0);
+            handler0.postDelayed(() -> mUVCCamera.setZoom(psitionAndValue0), interval0);
             psitionAndValue1 = ((position + 1) << 8) | (0x000000ff & value1);
-            handler0.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    mUVCCamera.setZoom(psitionAndValue1);
-                }
-            }, interval1);
-            handler0.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    mUVCCamera.whenShutRefresh();
-                }
-            }, interval2);
-            handler0.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    mUVCCamera.setZoom(0x80ff);
-                }
-            }, interval3);
+            handler0.postDelayed(() -> mUVCCamera.setZoom(psitionAndValue1), interval1);
+            handler0.postDelayed(() -> mUVCCamera.whenShutRefresh(), interval2);
+            handler0.postDelayed(() -> mUVCCamera.setZoom(0x80ff), interval3);
         }
     }
 

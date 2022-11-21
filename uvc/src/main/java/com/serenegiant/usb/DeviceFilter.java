@@ -78,10 +78,6 @@ public final class DeviceFilter {
 
     /**
      * 指定したxmlリソースからDeviceFilterリストを生成する
-     *
-     * @param context
-     * @param deviceFilterXmlId
-     * @return
      */
     public static List<DeviceFilter> getDeviceFilters(final Context context, final int deviceFilterXmlId) {
         final XmlPullParser parser = context.getResources().getXml(deviceFilterXmlId);
@@ -109,12 +105,6 @@ public final class DeviceFilter {
     /**
      * read as integer values with default value from xml(w/o exception throws)
      * resource integer id is also resolved into integer
-     *
-     * @param parser
-     * @param namespace
-     * @param name
-     * @param defaultValue
-     * @return
      */
     private static final int getAttributeInteger(final Context context, final XmlPullParser parser, final String namespace, final String name, final int defaultValue) {
         int result = defaultValue;
@@ -136,11 +126,7 @@ public final class DeviceFilter {
                 }
                 result = Integer.parseInt(v, radix);
             }
-        } catch (final NotFoundException e) {
-            result = defaultValue;
-        } catch (final NumberFormatException e) {
-            result = defaultValue;
-        } catch (final NullPointerException e) {
+        } catch (final NotFoundException | NumberFormatException | NullPointerException e) {
             result = defaultValue;
         }
         return result;
@@ -150,13 +136,6 @@ public final class DeviceFilter {
      * read as boolean values with default value from xml(w/o exception throws)
      * resource boolean id is also resolved into boolean
      * if the value is zero, return false, if the value is non-zero integer, return true
-     *
-     * @param context
-     * @param parser
-     * @param namespace
-     * @param name
-     * @param defaultValue
-     * @return
      */
     private static final boolean getAttributeBoolean(final Context context, final XmlPullParser parser, final String namespace, final String name, final boolean defaultValue) {
         boolean result = defaultValue;
@@ -183,11 +162,7 @@ public final class DeviceFilter {
                 final int val = Integer.parseInt(v, radix);
                 result = val != 0;
             }
-        } catch (final NotFoundException e) {
-            result = defaultValue;
-        } catch (final NumberFormatException e) {
-            result = defaultValue;
-        } catch (final NullPointerException e) {
+        } catch (final NotFoundException | NumberFormatException | NullPointerException e) {
             result = defaultValue;
         }
         return result;
@@ -196,12 +171,6 @@ public final class DeviceFilter {
     /**
      * read as String attribute with default value from xml(w/o exception throws)
      * resource string id is also resolved into string
-     *
-     * @param parser
-     * @param namespace
-     * @param name
-     * @param defaultValue
-     * @return
      */
     private static final String getAttributeString(final Context context, final XmlPullParser parser, final String namespace, final String name, final String defaultValue) {
         String result = defaultValue;
@@ -215,11 +184,7 @@ public final class DeviceFilter {
                 if (resId > 0)
                     result = context.getResources().getString(resId);
             }
-        } catch (final NotFoundException e) {
-            result = defaultValue;
-        } catch (final NumberFormatException e) {
-            result = defaultValue;
-        } catch (final NullPointerException e) {
+        } catch (final NotFoundException | NumberFormatException | NullPointerException e) {
             result = defaultValue;
         }
         return result;
@@ -315,11 +280,6 @@ public final class DeviceFilter {
     /**
      * 指定したクラス・サブクラス・プロトコルがこのDeviceFilterとマッチするかどうかを返す
      * mExcludeフラグは別途#isExcludeか自前でチェックすること
-     *
-     * @param clasz
-     * @param subclass
-     * @param protocol
-     * @return
      */
     private boolean matches(final int clasz, final int subclass, final int protocol) {
         return ((mClass == -1 || clasz == mClass)
@@ -329,9 +289,6 @@ public final class DeviceFilter {
     /**
      * 指定したUsbDeviceがこのDeviceFilterにマッチするかどうかを返す
      * mExcludeフラグは別途#isExcludeか自前でチェックすること
-     *
-     * @param device
-     * @return
      */
     public boolean matches(final UsbDevice device) {
         if (mVendorId != -1 && device.getVendorId() != mVendorId) {
@@ -375,9 +332,6 @@ public final class DeviceFilter {
 
     /**
      * このDeviceFilterに一致してかつmExcludeがtrueならtrueを返す
-     *
-     * @param device
-     * @return
      */
     public boolean isExclude(final UsbDevice device) {
         return isExclude && matches(device);
@@ -385,9 +339,6 @@ public final class DeviceFilter {
 
     /**
      * これって要らんかも, equalsでできる気が
-     *
-     * @param f
-     * @return
      */
     public boolean matches(final DeviceFilter f) {
         if (isExclude != f.isExclude) {

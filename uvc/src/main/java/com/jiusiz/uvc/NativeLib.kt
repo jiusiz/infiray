@@ -3,8 +3,8 @@ package com.jiusiz.uvc
 class NativeLib {
 
     /**
-     * A native method that is implemented by the 'uvc' native library,
-     * which is packaged with this application.
+     * 由 uvc 原生库实现的原生方法，与此应用程序一起打包。
+     * 在这里写c++原生方法的引用
      */
     external fun stringFromJNI(): String
 

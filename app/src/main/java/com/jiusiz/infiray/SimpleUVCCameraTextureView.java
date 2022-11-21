@@ -1,26 +1,3 @@
-/*
- *  UVCCamera
- *  library and sample to access to UVC web camera on non-rooted Android device
- *
- * Copyright (c) 2014-2017 saki t_saki@serenegiant.com
- *
- *  Licensed under the Apache License, Version 2.0 (the "License");
- *  you may not use this file except in compliance with the License.
- *   You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- *   Unless required by applicable law or agreed to in writing, software
- *   distributed under the License is distributed on an "AS IS" BASIS,
- *   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *   See the License for the specific language governing permissions and
- *   limitations under the License.
- *
- *  All files in the folder are under this Apache License, Version 2.0.
- *  Files in the libjpeg-turbo, libusb, libuvc, rapidjson folder
- *  may have a different license, see the respective files.
- */
-
 package com.jiusiz.infiray;
 
 import android.content.Context;
@@ -28,6 +5,9 @@ import android.util.AttributeSet;
 import android.view.TextureView;
 
 /**
+ * 在保持指定纵横比的情况下更改视图大小。
+ * 如果您在 FrameLayout 中设置此视图并设置属性 android:layout_gravity="center"，
+ * 您可以在屏幕中央显示此视图并保持内容的纵横比，最好可以将纵横比设置为 xml 属性
  * change the view size with keeping the specified aspect ratio.
  * if you set this view with in a FrameLayout and set property "android:layout_gravity="center",
  * you can show this view in the center of screen and keep the aspect ratio of content
@@ -37,7 +17,7 @@ public class SimpleUVCCameraTextureView extends TextureView    // API >= 14
         implements AspectRatioViewInterface{
 
     private double mRequestedAspect = -1.0;
-    private String TAG = "SimpleUVCCameraTextureView";
+    private final String TAG = "SimpleUVCCameraTextureView";
     public SimpleUVCCameraTextureView(final Context context) {
         this(context, null, 0);
     }
