@@ -1,4 +1,4 @@
-package com.jiusiz.uvc;
+package com.serenegiant.usb;
 
 import android.content.Context;
 import android.content.res.Resources.NotFoundException;

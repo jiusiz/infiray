@@ -1,4 +1,4 @@
-package com.jiusiz.uvc;
+package com.serenegiant.usb;
 
 public interface IButtonCallback {
     void onButton(int button, int state);

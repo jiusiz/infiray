@@ -21,7 +21,7 @@
  *  may have a different license, see the respective files.
  */
 
-package com.jiusiz.uvc;
+package com.serenegiant.usb;
 
 import android.graphics.SurfaceTexture;
 import android.hardware.usb.UsbDevice;
@@ -31,7 +31,7 @@ import android.view.Surface;
 import android.view.SurfaceHolder;
 
 //import com.serenegiant.usb.USBMonitor.UsbControlBlock;
-import com.jiusiz.uvc.USBMonitor.UsbControlBlock;
+import com.serenegiant.usb.USBMonitor.UsbControlBlock;
 
 import org.json.JSONArray;
 import org.json.JSONException;

@@ -15,14 +15,10 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-//import com.serenegiant.usb.ITemperatureCallback;
-//import com.serenegiant.usb.IFrameCallback;
-//import com.serenegiant.usb.UVCCamera;
-//import com.serenegiant.usb.USBMonitor;
-import com.jiusiz.uvc.ITemperatureCallback;
-import com.jiusiz.uvc.IFrameCallback;
-import com.jiusiz.uvc.UVCCamera;
-import com.jiusiz.uvc.USBMonitor;
+import com.serenegiant.usb.ITemperatureCallback;
+import com.serenegiant.usb.IFrameCallback;
+import com.serenegiant.usb.UVCCamera;
+import com.serenegiant.usb.USBMonitor;
 
 import java.io.File;
 import java.io.FileOutputStream;

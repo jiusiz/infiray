@@ -21,7 +21,7 @@
  *  may have a different license, see the respective files.
  */
 
-package com.jiusiz.uvc;
+package com.serenegiant.usb;
 
 import static android.app.PendingIntent.FLAG_CANCEL_CURRENT;
 
@@ -704,6 +704,7 @@ public class USBMonitor {
      */
     @SuppressLint("NewApi")
     public static String getDeviceKeyName(UsbDevice device, String serial, boolean useNewAPI) {
+        Log.i(":getDeviceKeyName", device.toString());
         if (device == null) return "";
         StringBuilder sb = new StringBuilder();
         sb.append(device.getVendorId());
@@ -721,10 +722,11 @@ public class USBMonitor {
         }
         if (useNewAPI && BuildCheck.isAndroid5()) {
             sb.append("#");
-            if (TextUtils.isEmpty(serial)) {
-                sb.append(device.getSerialNumber());
-                sb.append("#");    // API >= 21
-            }
+            // 报错为缺少权限，先注释
+            //if (TextUtils.isEmpty(serial)) {
+            //    sb.append(device.getSerialNumber());
+            //    sb.append("#");    // API >= 21
+            //}
             sb.append(device.getManufacturerName());
             sb.append("#");    // API >= 21
             sb.append(device.getConfigurationCount());

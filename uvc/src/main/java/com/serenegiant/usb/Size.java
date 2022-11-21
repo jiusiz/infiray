@@ -21,7 +21,7 @@
  *  may have a different license, see the respective files.
  */
 
-package com.jiusiz.uvc;
+package com.serenegiant.usb;
 
 import android.os.Parcel;
 import android.os.Parcelable;
