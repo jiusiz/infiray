@@ -1,8 +1,10 @@
-package com.jiusiz.infiray;
+package com.jiusiz.infiray.view;
 
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.TextureView;
+
+import com.jiusiz.infiray.AspectRatioViewInterface;
 
 /**
  * 在保持指定纵横比的情况下更改视图大小。
@@ -14,10 +16,11 @@ import android.view.TextureView;
  * XXX it is better that can set the aspect raton a a xml property
  */
 public class SimpleUVCCameraTextureView extends TextureView    // API >= 14
-        implements AspectRatioViewInterface{
+        implements AspectRatioViewInterface {
 
     private double mRequestedAspect = -1.0;
     private final String TAG = "SimpleUVCCameraTextureView";
+
     public SimpleUVCCameraTextureView(final Context context) {
         this(context, null, 0);
     }

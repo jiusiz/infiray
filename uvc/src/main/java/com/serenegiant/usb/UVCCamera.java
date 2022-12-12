@@ -165,6 +165,8 @@ public class UVCCamera {
     }
 
     /**
+     * 连接到 UVC 相机
+     * 调用此方法前需要 USB 权限
      * connect to a UVC camera
      * USB permission is necessary before this method is called
      */
@@ -444,6 +446,7 @@ public class UVCCamera {
     public synchronized int startPreview() {
         int result = 1;
         if (mCtrlBlock != null) {
+            // 原生预览方法
             result = nativeStartPreview(mNativePtr);
         }
         return result;
@@ -892,6 +895,7 @@ public class UVCCamera {
     /**
      * 设置缩放
      * 这可能不适用于相机和设备的某些组合
+     *
      * @param zoom [%]
      */
     public synchronized void setZoom(final int zoom) {
@@ -1146,7 +1150,6 @@ public class UVCCamera {
 
     public void changePalette(int typeOfPalette) {
         if (mCtrlBlock != null) {
-            //Log.e(TAG, "stopTemp");
             if (typeOfPalette >= 6) {
                 int intPalette[] = new int[256 * 3];
                 byte palette[] = new byte[256 * 3];
@@ -1441,15 +1444,3 @@ public class UVCCamera {
 
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
