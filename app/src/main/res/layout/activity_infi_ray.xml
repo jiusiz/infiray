@@ -4,12 +4,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/white"
     tools:context=".InfiRayActivity">
 
     <RelativeLayout
         android:id="@+id/showQY"
         android:layout_width="match_parent"
-        android:layout_height="400dp"
+        android:layout_height="350dp"
         android:layout_alignParentEnd="true"
         app:layout_constraintStart_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -20,74 +21,59 @@
             android:layout_width="match_parent"
             android:layout_height="350dp" />
 
-        <TextView
-            android:id="@+id/tv_temp"
+        <TextureView
+            android:id="@+id/temp_view"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_marginBottom="0dp"
-            android:textColor="#000"
-            android:text="1111"
-            android:textSize="18sp"/>
-
-        <!--<TextView-->
-        <!--    android:id="@+id/tv_temp"-->
-        <!--    android:layout_alignParentRight="true"-->
-        <!--    android:layout_marginTop="10dp"-->
-        <!--    android:layout_marginRight="10dp"-->
-        <!--    android:textColor="#000"-->
-        <!--    android:layout_width="wrap_content"-->
-        <!--    android:layout_height="wrap_content" />-->
+            android:layout_height="350dp" />
 
     </RelativeLayout>
 
-    <!--<Button
-        android:id="@+id/preview_button"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:keepScreenOn="true"
-        android:scaleType="centerCrop"
-        android:text="预览" />-->
-
     <Button
         android:id="@+id/camera_button"
-        android:layout_width="100dp"
+        android:layout_width="0dp"
         android:layout_height="50dp"
         android:text="测温"
+        app:layout_constraintEnd_toStartOf="@id/shut_button"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/showQY" />
+
+    <Button
+        android:id="@+id/shut_button"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:text="快门"
+        app:layout_constraintEnd_toStartOf="@id/range_button"
+        app:layout_constraintStart_toEndOf="@+id/camera_button"
+        app:layout_constraintTop_toBottomOf="@+id/showQY" />
+
+    <Button
+        android:id="@+id/range_button"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:scaleType="centerCrop"
+        android:text="宽测温"
+        app:layout_constraintEnd_toStartOf="@id/color_button"
+        app:layout_constraintStart_toEndOf="@+id/shut_button"
+        app:layout_constraintTop_toBottomOf="@+id/showQY" />
+
+    <Button
+        android:id="@+id/color_button"
+        android:layout_width="0dp"
+        android:layout_height="50dp"
+        android:text="色板"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/range_button"
         app:layout_constraintTop_toBottomOf="@+id/showQY" />
 
     <Button
         android:id="@+id/getcapture_button"
         android:layout_width="100dp"
-        android:layout_height="50dp"
+        android:layout_height="100dp"
+        android:background="@drawable/tacke_picture"
         android:text="拍照"
-        app:layout_constraintStart_toEndOf="@+id/camera_button"
-        app:layout_constraintTop_toBottomOf="@+id/showQY" />
-
-    <Button
-        android:id="@+id/shut_button"
-        android:layout_width="100dp"
-        android:layout_height="50dp"
-        android:text="快门"
-        app:layout_constraintStart_toEndOf="@+id/getcapture_button"
-        app:layout_constraintTop_toBottomOf="@+id/showQY" />
-
-    <Button
-        android:id="@+id/color_button"
-        android:layout_width="100dp"
-        android:layout_height="50dp"
-        android:text="色板"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/camera_button" />
-
-    <Button
-        android:id="@+id/range_button"
-        android:layout_width="100dp"
-        android:layout_height="50dp"
-        android:scaleType="centerCrop"
-        android:text="宽测温"
-        app:layout_constraintStart_toEndOf="@+id/color_button"
-        app:layout_constraintTop_toBottomOf="@+id/getcapture_button" />
+        app:layout_constraintTop_toBottomOf="@+id/showQY" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

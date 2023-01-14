@@ -1,22 +1,21 @@
 package com.jiusiz.infiray
 
 import android.app.Activity
-import android.graphics.Bitmap
-import android.graphics.SurfaceTexture
+import android.content.ContentValues
+import android.graphics.*
 import android.hardware.usb.UsbDevice
-import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
+import android.os.*
+import android.provider.MediaStore
 import android.util.Log
 import android.view.Surface
 import android.view.SurfaceHolder
+import android.view.TextureView
 import android.view.View
 import android.widget.Button
-import android.widget.TextView
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import com.jiusiz.infiray.utils.ByteUtils
-import com.jiusiz.infiray.utils.HttpUtils
 import com.jiusiz.infiray.view.SimpleUVCCameraTextureView
 import com.serenegiant.usb.IFrameCallback
 import com.serenegiant.usb.ITemperatureCallback
@@ -24,21 +23,16 @@ import com.serenegiant.usb.USBMonitor
 import com.serenegiant.usb.USBMonitor.OnDeviceConnectListener
 import com.serenegiant.usb.USBMonitor.UsbControlBlock
 import com.serenegiant.usb.UVCCamera
+import java.io.OutputStream
 import java.util.*
 import kotlin.concurrent.thread
 
-// 基本功能：
-// 1.打开相机/关闭相机
-// 2.开启测温/停止测温
-// 3.拍照（保存图片）
-// 4.打快门 5.切换色板（设置色板）
-// 6.获取参数/设置参数
-// 7.切换宽测温
+@RequiresApi(Build.VERSION_CODES.Q)
 class InfiRayActivity : AppCompatActivity() {
 
-    private val TAG = "InfiRayActivity"
-    private val preview_width = 384.0
-    private val preview_heigth = 292.0
+    private val tag = "InfiRayActivity"
+    private val previewWidth = 384.0
+    private val previewHeight = 292.0
     private lateinit var mUVCCameraView: SimpleUVCCameraTextureView
     private lateinit var mUSBMonitor: USBMonitor
     private lateinit var mPreviewSurface: Surface
@@ -47,8 +41,8 @@ class InfiRayActivity : AppCompatActivity() {
     private lateinit var mColor: Button
     private lateinit var mRange: Button
     private lateinit var mCapture: Button
-    private lateinit var tTemp: TextView
     private lateinit var activity: Activity
+    private lateinit var tempView: TextureView
 
     // 色板颜色
     private var iColor = 0
@@ -61,16 +55,21 @@ class InfiRayActivity : AppCompatActivity() {
         setContentView(R.layout.activity_infi_ray)
         activity = this
         mUVCCameraView = findViewById(R.id.camera_preview)
-        mUVCCameraView.setAspectRatio((preview_width / preview_heigth))
+        mUVCCameraView.setAspectRatio((previewWidth / previewHeight))
+        // 画面选择90度
+        //mUVCCameraView.rotation = 90F
         mCameraButton = findViewById(R.id.camera_button)
         mShutter = findViewById(R.id.shut_button)
         mColor = findViewById(R.id.color_button)
         mRange = findViewById(R.id.range_button)
         mCapture = findViewById(R.id.getcapture_button)
-        tTemp = findViewById(R.id.tv_temp)
+        tempView = findViewById(R.id.temp_view)
+
+        tempView.isOpaque = false
         setClickListener()
         mUSBMonitor = USBMonitor(this, mOnDeviceConnectListener)
     }
+
 
     private fun setClickListener() {
         mCameraButton.setOnClickListener(mOnClickListener)
@@ -82,6 +81,13 @@ class InfiRayActivity : AppCompatActivity() {
 
     private var isTemp = false
 
+    @RequiresApi(Build.VERSION_CODES.Q)
+    private fun takePicture() {
+        val bitmap = mUVCCameraView.bitmap
+        //拍照
+        saveImage(bitmap)
+    }
+
     private val mOnClickListener = View.OnClickListener { view ->
         when (view.id) {
             R.id.camera_button -> synchronized(mSync) {
@@ -91,11 +97,7 @@ class InfiRayActivity : AppCompatActivity() {
                 else stopTemp()
             }
             R.id.shut_button -> mUVCCamera.zoom = 0x8000 //打快门
-            R.id.getcapture_button -> {
-                val bitmap = mUVCCameraView.bitmap
-                //拍照
-                saveImage(bitmap)
-            }
+            R.id.getcapture_button -> takePicture()
             R.id.range_button -> {
                 if (temperatureRange == 120) {
                     temperatureRange = 400
@@ -157,7 +159,7 @@ class InfiRayActivity : AppCompatActivity() {
             override fun run() {
                 // 打快门
                 mUVCCamera.zoom = 0x8000
-                Log.i(TAG, "每隔3分钟执行打快门")
+                Log.i(tag, "每隔3分钟执行打快门")
             }
         }, 1000, 1000 * 60 * 3)
     }
@@ -170,12 +172,73 @@ class InfiRayActivity : AppCompatActivity() {
             }
             return
         }
+        val xZoom = bmp.width / 256.0f
+        val yZoom = bmp.height / 192.0f
+        val highX = temperature1[1] * xZoom
+        val highY = temperature1[2] * yZoom
+        val highT = temperature1[3]
+        val lowX = temperature1[4] * xZoom
+        val lowY = temperature1[5] * yZoom
+        val lowT = temperature1[6]
+        Log.i(tag, "bmp.width = ${bmp.width}")
+        Log.i(tag, "bmp.height = ${bmp.height}")
+        Log.i(tag, "highX = $highX，highY = $highY，highT = $highT")
+        Log.i(tag, "lowX = $lowX，lowY = $lowY，lowT = $lowT")
+        // 准备数据
+        val paint = Paint(Paint.ANTI_ALIAS_FLAG)
+        paint.color = Color.RED
+        paint.strokeWidth = paintStrokeWidth
+        paint.textSize = paintTextSize
+
+        val canvas = Canvas(bmp)
+        canvas.drawLine(highX - 10, highY, highX + 10, highY, paint)
+        canvas.drawLine(highX, highY - 10, highX, highY + 10, paint)
+        //canvas.drawPoint(highX, highY, paint)
+        canvas.drawText(highT.toString(), highX - 20, highY + 40, paint)
+        canvas.drawLine(lowX - 10, lowY, lowX + 10, lowY, paint)
+        canvas.drawLine(lowX, lowY - 10, lowX, lowY + 10, paint)
+        //canvas.drawPoint(lowX, lowY, paint)
+        canvas.drawText(lowT.toString(), lowX - 20, lowY + 40, paint)
         thread {
-            // 推送图片流到指定url
-            HttpUtils.postStream("http://10.66.16.14:8080/up/img") { out ->
-                // 将bitmap压缩成jpg，写入到输出流中
-                bmp.compress(Bitmap.CompressFormat.JPEG, 100, out)
+            //获取要保存的图片的位图,创建一个保存的Uri
+            val values = ContentValues()
+            //设置图片名称
+            values.put(
+                MediaStore.Images.Media.DISPLAY_NAME,
+                "infiray-${System.currentTimeMillis()}"
+            )
+            //设置图片格式
+            values.put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+            //设置图片路径
+            values.put(
+                MediaStore.Images.Media.RELATIVE_PATH,
+                Environment.DIRECTORY_PICTURES + "/infiray"
+            )
+            val saveUri =
+                contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
+            if (saveUri.toString().isBlank()) {
+                runOnUiThread {
+                    Toast.makeText(this, "保存失败！", Toast.LENGTH_SHORT).show()
+                }
+                return@thread
             }
+            val outputStream: OutputStream? = contentResolver.openOutputStream(saveUri!!)
+            if (bmp.compress(Bitmap.CompressFormat.PNG, 100, outputStream)) {
+                runOnUiThread {
+                    Toast.makeText(this, "保存成功！", Toast.LENGTH_SHORT).show()
+                }
+            } else {
+                runOnUiThread {
+                    Toast.makeText(this, "保存失败！", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+            // 上传图片
+            //val outputStream = ByteArrayOutputStream()
+            //bmp.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+            //val byteArray = outputStream.toByteArray()
+            //val res = HttpUtils.uploadJpg("http://192.168.3.15:13421/up/file", byteArray)
+            //Log.i(tag, "okhttp回调的数据为$res")
         }
     }
 
@@ -194,9 +257,7 @@ class InfiRayActivity : AppCompatActivity() {
             mUVCCamera.startTemp()
             isTemp = true
         } else {
-            runOnUiThread {
-                Toast.makeText(this, "未插入摄像头！", Toast.LENGTH_SHORT).show()
-            }
+            runOnUiThread { Toast.makeText(this, "未插入摄像头！", Toast.LENGTH_SHORT).show() }
         }
     }
 
@@ -205,6 +266,8 @@ class InfiRayActivity : AppCompatActivity() {
             mUVCCamera.stopTemp()
             isTemp = false
         }
+        // 清除温度显示
+        tempView.clean()
     }
 
     override fun onStop() {
@@ -226,7 +289,7 @@ class InfiRayActivity : AppCompatActivity() {
 
     // Activity从后台重新回到前台时被调用
     override fun onRestart() {
-        Log.e(TAG, "onRestart:")
+        Log.e(tag, "onRestart:")
         mUVCCameraView.onResume()
         super.onRestart()
     }
@@ -283,7 +346,10 @@ class InfiRayActivity : AppCompatActivity() {
             Handler(Looper.getMainLooper()).postDelayed({
                 // 切换色板
                 mUVCCamera.changePalette(4)
-            }, 1000)
+                // 打开测温
+                turnOnTemp()
+            }, 1500)
+
         }
 
         override fun onDisconnect(device: UsbDevice, ctrlBlock: UsbControlBlock) {
@@ -343,7 +409,7 @@ class InfiRayActivity : AppCompatActivity() {
         stProductSoftVersion = String(tempPara, 128 - 16, 16)
         sn = usbDevice.serialNumber.toString()
         Log.e(
-            TAG, "校正:" + stFix // 温度校正
+            tag, "校正:" + stFix // 温度校正
                     + ",反射温度:" + stRefltmp // 反射温度
                     + ",环境温度:" + stAirtmp // 环境温度
                     + ",湿度:" + stHumi // 湿度
@@ -430,10 +496,6 @@ class InfiRayActivity : AppCompatActivity() {
     private val frameData = ByteArray(640 * 512 * 4)
     private val mIFrameCallback = IFrameCallback { frameData ->
         frameData[this.frameData, 0, frameData.capacity()]
-        // Bitmap bm = Bitmap.createBitmap(mWidth, mHeight-4, Bitmap.Config.ARGB_8888);
-        // bm.copyPixelsFromBuffer(ByteBuffer.wrap(FrameData));
-        // bm操作
-        // saveImage(bm);
     }
 
     // 开始预览
@@ -464,23 +526,22 @@ class InfiRayActivity : AppCompatActivity() {
 
     // 测温数据返回
     private var temperature1 = FloatArray(640 * 512 + 10)
+
+    //temperature1[1]//MAXX1，最高温点X坐标
+    //temperature1[2]//MAXY1，最高温点Y坐标
+    //temperature1[4]//MINX1，最低温点X坐标
+    //temperature1[5] //MIXY1，最低温点Y坐标
     private val ahITemperatureCallback = ITemperatureCallback { temperature ->
-        Log.i("测温", temperature1.contentToString())
-        val center = temperature[0] //中心温度
-        //temperature1[1]//MAXX1，最高温点X坐标
-        //temperature1[2]//MAXY1，最高温点Y坐标
-        val highest = temperature[3] //最高温
-        //temperature1[4]//MINX1，最低温点X坐标
-        //temperature1[5] //MIXY1，最低温点Y坐标
-        val lowest = temperature[6] //最低温
-        //7，8和9为备用参数
-        val text = "中心温度：%.2f | 最高温度：%.2f | 最低温度：%.2f".format(center, highest, lowest)
-        Log.i("温度", text)
+        val xZoom = mUVCCameraView.width / 256f
+        val yZoom = mUVCCameraView.height / 192f
         runOnUiThread {
-            tTemp.text = text
+            tempView.drawTemp(
+                temperature[1], temperature[2], temperature[3],
+                temperature[4], temperature[5], temperature[6],
+                xZoom, yZoom
+            )
         }
         System.arraycopy(temperature, 0, temperature1, 0, (mHeight - 4) * mWidth + 10)
-        Log.i("测温拷贝", temperature1.contentToString())
     }
 
     private val mSendCommand = SendCommand()
@@ -588,6 +649,9 @@ class InfiRayActivity : AppCompatActivity() {
     }
 
     companion object {
+        private const val paintTextSize = 30f
+        private const val paintStrokeWidth = 3.4f
+
         /**
          * 通过byte数组取到short
          */
@@ -595,6 +659,49 @@ class InfiRayActivity : AppCompatActivity() {
             val b1 = b[index + 1].toInt()
             val b0 = b[index].toInt()
             return ((b1 shl 8) or (b0 and 0xff)).toShort()
+        }
+
+        fun TextureView.clean() {
+            val canvas = this.lockCanvas()
+            if (canvas != null) {
+                //绘制透明色
+                canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR)
+                unlockCanvasAndPost(canvas)
+            }
+        }
+
+        fun TextureView.drawTemp(
+            highX: Float,
+            highY: Float,
+            highT: Float,
+            lowX: Float,
+            lowY: Float,
+            lowT: Float,
+            xZoom: Float,
+            yZoom: Float
+        ) {
+            val mHighX = highX * xZoom
+            val mHighY = highY * yZoom
+            val mLowX = lowX * xZoom
+            val mLowY = lowY * yZoom
+            val canvas = this.lockCanvas()
+            if (canvas != null) {
+                //绘制透明色
+                canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR)
+                // 准备数据
+                val paint = Paint(Paint.ANTI_ALIAS_FLAG)
+                paint.color = Color.RED
+                paint.strokeWidth = paintStrokeWidth
+                paint.textSize = paintTextSize
+
+                canvas.drawLine(mHighX - 10, mHighY, mHighX + 10, mHighY, paint)
+                canvas.drawLine(mHighX, mHighY - 10, mHighX, mHighY + 10, paint)
+                canvas.drawText(highT.toString(), mHighX - 20, mHighY + 40, paint)
+                canvas.drawLine(mLowX - 10, mLowY, mLowX + 10, mLowY, paint)
+                canvas.drawLine(mLowX, mLowY - 10, mLowX, mLowY + 10, paint)
+                canvas.drawText(lowT.toString(), mLowX - 20, mLowY + 40, paint)
+                unlockCanvasAndPost(canvas)
+            }
         }
 
         /**

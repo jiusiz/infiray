@@ -21,28 +21,30 @@ InfiRay-Xtherm Demo 红外测温摄像头示例程序
 
 - 2、给与infiray权限
 
-  读取手机存储、**相机**、录音、媒体音量控制权限建议都允许
+读取手机存储、**相机**、录音、媒体音量控制权限建议都允许
 
-  ![权限截图](img/1.jpg)
+<img src="img/权限界面.jpg" width="230px" height="500px" />
 
 - 3、打开应用，插入红外测温摄像头
 
-  提示是否允许访问摄像头，一定要点击 **确定**
+提示是否允许访问摄像头，一定要点击 **确定**
 
-  ![插入摄像头](img/4.jpg)
+<img src="img/访问允许界面.jpg" width="230px" height="500px" />
 
 - 4、这样就能看到预览画面
 
-  如图
-
-  ![预览1](img/3.jpg)
+如图
+ 
+<img src="img/预览.jpg" width="230px" height="500px" />
 
 点击色板，可以切换显示颜色，如图
 
-![预览2](img/2.jpg)
+<img src="img/色板-黑热.jpg" width="230px" height="500px" />
 
-- 5、未实现的功能
+- 5、拍照
 
-  - **拍照**
+点击中间拍照按钮，即可保存照片到相册内，图片名为 `infiray-时间戳.jpg`
 
-    点击拍照无法保存
+保存路径为 `Pictures\infiray`
+
+<img src="img/保存位置.jpg" width="300px" height="207px" />

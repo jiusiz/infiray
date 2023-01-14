@@ -47,7 +47,7 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-            <!-- 检测USB设备，如果开启，将会在插入摄像头的时候提示打开 -->
+            <!-- 检测USB设备，如果开启，将会在插入摄像头的时候提示打开本应用 -->
             <!--<intent-filter>-->
             <!--    <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED"/>-->
             <!--</intent-filter>-->
